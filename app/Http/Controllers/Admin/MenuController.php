@@ -98,7 +98,7 @@ class MenuController extends Controller
                 'subcategory_id' => $validatedData['subcategory_id'],
                 'subsubcategory_id' => $validatedData['subsubcategory_id'],
                 'food_type_id' => $validatedData['food_type_id'],
-                'meal_image' => $meal_image,
+                'meal_image' => $meal_image ?? null,
                 'meal_name' => $validatedData['meal_name'], 
                 'meal_qty' => $validatedData['meal_qty'],
                 'meal_amount' => $validatedData['meal_amount'],
@@ -140,9 +140,9 @@ class MenuController extends Controller
                 'category_id' => 'required|exists:meal_categorys,id',
                 'subcategory_id' => 'required|exists:meal_subcategorys,id',
                 'subsubcategory_id' => 'required|exists:meal_subsubcategorys,id',
-                'food_type_id' => 'sometimes|required|array',
-                'meal_image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'meal_qty' => 'required|integer|min:1',
+                'food_type_id' => 'required',
+                'meal_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'meal_qty' => 'required',
                 'meal_amount' => 'required|numeric|min:0',
                 'meal_description' => 'nullable|string|max:255',
             ]);
@@ -155,7 +155,7 @@ class MenuController extends Controller
             $menu->category_id = $validatedData['category_id'] ?? $menu->category_id;
             $menu->subcategory_id = $validatedData['subcategory_id'] ?? $menu->subcategory_id;
             $menu->subsubcategory_id = $validatedData['subsubcategory_id'] ?? $menu->subsubcategory_id;
-            $menu->food_type_id = implode(',', $validatedData['food_type_id'] ?? explode(',', $menu->food_type_id));
+            $menu->food_type_id = $validatedData['food_type_id'];
             $menu->meal_qty = $validatedData['meal_qty'] ?? $menu->meal_qty;
             $menu->meal_amount = $validatedData['meal_amount'] ?? $menu->meal_amount;
             $menu->meal_description = $validatedData['meal_description'] ?? $menu->meal_description;
