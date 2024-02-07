@@ -47,30 +47,6 @@ class MenuController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    // public function store(Request $request)
-    // {
-    //     try {
-    //         $validator = Validator::make($request->all(), [
-    //             'subsubcategory_id' => 'required|exists:tbl_meal_subcategories,id',
-    //             'meal_name' => 'required|string',
-    //         ]);
-    
-    //         if ($validator->fails()) {
-    //             return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors(), 'status' => 400], 400);
-    //         }
-    
-    //         $menu = new Menu();
-    //         $menu->subsubcategory_id = $request->input('subsubcategory_id');
-    //         $menu->meal_name = $request->input('meal_name');
-    
-    //         $menu->save();
-    
-    //         return response()->json(['message' => 'Menu created successfully', 'data' => $menu, 'status' => 201], 201);
-    //     } catch (ValidationException $exception) {
-    //         $errors = $exception->errors();
-    //         return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
-    //     }
-    // }
     public function store(Request $request)
     {
         try {

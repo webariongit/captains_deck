@@ -92,6 +92,7 @@ Route::prefix('admin')->group(function () {
     Route::resource('/employee-positions', AdminEmployeePositionController::class)->only(['index', 'store', 'destroy']);
     Route::post('/employee-positions-update', [AdminEmployeePositionController::class, 'update']);
     
+    Route::resource('/contactInfo', AdminContactInfoController::class)->only(['index', 'store', 'destroy']);
     Route::post('/contactInfo-update', [AdminContactInfoController::class, 'update']);
 
 });
