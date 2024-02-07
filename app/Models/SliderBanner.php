@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class SliderBanner extends Model
 {
     // use HasFactory;
-    protected $table = "slider_banners" ;
+    protected $table = "tbl_banners" ;
 }

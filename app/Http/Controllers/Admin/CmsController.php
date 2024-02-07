@@ -24,7 +24,7 @@ class CmsController extends Controller
             $query = CMS::query();
 
             if ($request->filled('title')) {
-                $data = $query->where('title', $request->title)->get();
+                $data = $query->where('title', $request->title)->first();
             } else {
                 $data = $query->get();
             }
@@ -126,4 +126,10 @@ class CmsController extends Controller
     {
         //
     }
+
+
+
+
+
 }
+

@@ -9,6 +9,6 @@ class Gallery extends Model
 {
     // use HasFactory;
     protected $guarded = [];
-    protected $table = "gallerys" ;
+    protected $table = "tbl_gallerys" ;
     protected $fillable = ['media_type', 'media'];
 }

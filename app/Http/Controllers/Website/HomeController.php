@@ -7,28 +7,100 @@ use Illuminate\Http\Request;
 
 # Models
 use App\Models\SliderBanner;
+use App\Models\Gallery;
+use App\Models\Testimonial;
 
 class HomeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    // public function index(Request $request)
+    // {
+    //     try {
+    //         $query = SliderBanner::query();
+            
+    //         $data[] = [
+    //             'key_name' => 'Banner',
+    //             'key_data' => SliderBanner::where('type', 'banner')->get(),
+    //         ];
+            
+    //         $data[] = [
+    //             'key_name' => 'Content',
+    //             'key_data' => SliderBanner::where('type', 'content')->get(),
+    //         ];
+            
+    //         $data[] = [
+    //             'key_name' => 'blogs',
+    //             'key_data' => SliderBanner::where('type', 'blogs')->get(),
+    //         ];
+            
+    //         $data[] = [
+    //             'key_name' => 'available_offers',
+    //             'key_data' => SliderBanner::where('type', 'available_offers')->get(),
+    //         ];
+            
+    //         $data[] = [
+    //             'key_name' => 'Gallery',
+    //             'key_data' => Gallery::where('event_id', null)->get(),
+    //         ];
+            
+    //         $data[] = [
+    //             'key_name' => 'Testimonials',
+    //             'key_data' => Testimonial::all(),
+    //         ];
+
+    //         // $data[]['base_url'] =  url('/');
+    
+    //         return response()->json([ 'base_url' =>  url('/'),'data' => $data , 'status' => 404],200);
+
+    //     } catch (ModelNotFoundException $exception) {
+    //         return response()->json(['message' => 'Slider banner not found', 'status' => 404], 404);
+    //     } catch (ValidationException $exception) {
+    //         $errors = $exception->errors();
+    //         return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
+    //     }
+    // }
+
     public function index(Request $request)
     {
         try {
             $query = SliderBanner::query();
-            $data['Banner'] = $query->where('type', 'banner')->get();
+            
+            $data[] = [
+                'key_name' => 'Banner',
+                'key_data' => SliderBanner::where('title', 'banner')->get(),
+            ];
+            
+            $data[] = [
+                'key_name' => 'Content',
+                'key_data' => SliderBanner::where('title', 'content')->get(),
+            ];
+            
+            $data[] = [
+                'key_name' => 'blogs',
+                'key_data' => SliderBanner::where('title', 'blogs')->get(),
+            ];
+            
+            $data[] = [
+                'key_name' => 'available_offers',
+                'key_data' => SliderBanner::where('title', 'available_offers')->get(),
+            ];
+            
+            $data[] = [
+                'key_name' => 'Gallery',
+                'key_data' => Gallery::where('event_id', null)->get(),
+            ];
+            
+            $data[] = [
+                'key_name' => 'Testimonials',
+                'key_data' => Testimonial::all(),
+            ];
 
-            $query = SliderBanner::query();
-            $data['content'] = $query->where('type', 'content')->get();
-
-            $query = SliderBanner::query();
-            $data['contentWithImage'] = $query->where('type', 'contentWithImage')->get();
-
-            $query = SliderBanner::query();
-            $data['offer'] = $query->where('type', 'offer')->get();
+            // $data[]['base_url'] =  url('/');
     
-            return response()->json(['data' => $data]);
+            return response()->json([ 'base_url' =>  url('/'),'data' => $data , 'status' => 200],200);
+
         } catch (ModelNotFoundException $exception) {
             return response()->json(['message' => 'Slider banner not found', 'status' => 404], 404);
         } catch (ValidationException $exception) {

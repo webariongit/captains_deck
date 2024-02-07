@@ -15,27 +15,33 @@ class GalleryController extends Controller
     {
         try {
             $request->validate([
-                'media_type' => 'nullable|string|in:image,videos',
-                'order_direction' => 'nullable|in:asc,desc', 
-                'page' => 'nullable', 
+                'media_type' => 'nullable|string|in:image,video',
+                'orderBy' => 'nullable|in:asc,desc', 
+                'orderByColumn' => 'nullable|string',  
+                'page' => 'nullable|integer|min:1',  
             ]);
-            $page = $request->page ?? 10;
-            $orderByColumn = 'created_at';
-            $orderByDirection = $request->order_direction ?? 'desc';
-
+    
+            $page = $request->input('page', 10);  
+            $orderByColumn = $request->input('orderByColumn', 'created_at');
+            $orderBy = $request->input('orderBy', 'desc');
+    
             $query = Gallery::query();
-            if ($request->media_type) {
+            $query->whereNull('event_id'); 
+            $query->whereNotNull('media_types');
+            
+            if ($request->filled('media_type')) {
                 $query->where('media_types', $request->media_type);
             }
-
-            $galleries = $query->orderBy($orderByColumn, $orderByDirection)->paginate($page);
-
-            return response()->json(['url' => url('/'), 'data' => $galleries], 201);
+    
+            $galleries = $query->orderBy($orderByColumn, $orderBy)->paginate($page);
+    
+            return response()->json(['base_url' => url('/'), 'data' => $galleries , 'status' => 200], 200);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
         } 
     }
+    
 
 
     /**

@@ -17,34 +17,35 @@ class EventController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        try {
-            $query = Event::query();
+{
+    try {
+        $query = Event::query();
 
-            if ($request->id) {
-                $event = $query->find($request->id);
+        if ($request->id) {
+            $event = $query->find($request->id);
 
-                if (!$event) {
-                    return response()->json(['message' => 'Event not found', 'status' => 404], 404);
-                }
-
-                $event['gallery'] = Gallery::where('event_id', $event->id)->get();
-
-                if ($event['gallery']->isEmpty()) {
-                    return response()->json(['message' => 'Event has no galleries', 'status' => 404], 404);
-                }
-            } else {
-                $events = $query->get();
+            if (!$event) {
+                return response()->json(['message' => 'Event not found', 'status' => 404], 404);
             }
 
-            return response()->json($event ?? $events);
-        } catch (ModelNotFoundException $exception) {
-            return response()->json(['message' => 'Event not found', 'status' => 404], 404);
-        } catch (ValidationException $exception) {
-            $errors = $exception->errors();
-            return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
+            $event['gallery'] = Gallery::where('event_id', $event->id)->get();
+        } else {
+            $events = $query->get();
+
+            // foreach ($events as $key => $event) {
+            //     $events[$key]['gallery'] = [''=> Gallery::where('event_id', $event->id)->get()];
+            // }
         }
+
+        return response()->json($event ?? $events);
+    } catch (ModelNotFoundException $exception) {
+        return response()->json(['message' => 'Event not found', 'status' => 404], 404);
+    } catch (ValidationException $exception) {
+        $errors = $exception->errors();
+        return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
     }
+}
+
 
 
     /**

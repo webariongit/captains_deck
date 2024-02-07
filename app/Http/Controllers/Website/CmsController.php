@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 
 # Models
 use App\Models\CMS;
+use App\Models\ContactInfo;
 
 class CmsController extends Controller
 {
@@ -85,5 +86,12 @@ class CmsController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function ContactInfo()
+    {
+        $contactInfoList = ContactInfo::all();
+
+        return response()->json(['message' => 'Contact information retrieved successfully', 'data' => $contactInfoList]);
     }
 }

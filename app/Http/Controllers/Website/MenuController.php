@@ -23,36 +23,62 @@ class MenuController extends Controller
     public function index(Request $request)
     {
         try {
-            
-            $query = Menu::query();
-            $query->leftJoin('meal_categorys', 'menus.category_id', '=', 'meal_categorys.id');
-            $query->leftJoin('meal_subcategorys', 'menus.subcategory_id', '=', 'meal_subcategorys.id');
-            $query->leftJoin('meal_subsubcategorys', 'menus.subsubcategory_id', '=', 'meal_subsubcategorys.id');
-            $query->select(
-                'meal_categorys.name as category_name',
-                'meal_subcategorys.name as subcategory_name',
-                'meal_subsubcategorys.name as subsubcategory_name',
-                'menus.food_type_id',
-                'menus.meal_image',
-                'menus.meal_qty',
-                'menus.meal_amount',
-                'menus.meal_description',
-            );
-
-            $menus = $query->get();
-
-            foreach ($menus as $key => $menu) {
-                $foodType = FoodType::whereIn('id', explode(',', $menu->food_type_id))->get();
-        
-                $menus[$key]->foodType = $foodType;
+            if ($request->id) {
+                $mealCategory = MealCategory::find($request->id);
+    
+                if (!$mealCategory) {
+                    return response()->json(['message' => 'Meal category not found', 'status' => 404], 404);
+                }
+    
+                $result = [];
+                $result[$mealCategory->name] = [];
+    
+                $subCategories = MealSubCategory::where('category_id', $mealCategory->id)->get();
+    
+                foreach ($subCategories as $subcategory) {
+                    $result[$mealCategory->name][$subcategory->name] = [];
+    
+                    $subSubCategories = MealSubSubCategory::where('subcategory_id', $subcategory->id)->get();
+    
+                    foreach ($subSubCategories as $subsubcategory) {
+                        $result[$mealCategory->name][$subcategory->name][$subsubcategory->name] = Menu::where('subsubcategory_id', $subsubcategory->id)->get();
+                    }
+                }
+            } else {
+                $mealCategories = MealCategory::get();
+    
+                if (!$mealCategories) {
+                    return response()->json(['message' => 'Meal categories not found', 'status' => 404], 404);
+                }
+    
+                $result = [];
+    
+                foreach ($mealCategories as $category) {
+                    $result[$category->name] = [];
+    
+                    $subCategories = MealSubCategory::where('category_id', $category->id)->get();
+    
+                    foreach ($subCategories as $subcategory) {
+                        $result[$category->name][$subcategory->name] = [];
+    
+                        $subSubCategories = MealSubSubCategory::where('subcategory_id', $subcategory->id)->get();
+    
+                        foreach ($subSubCategories as $subsubcategory) {
+                            $result[$category->name][$subcategory->name][$subsubcategory->name] = Menu::where('subsubcategory_id', $subsubcategory->id)->get();
+                        }
+                    }
+                }
             }
-
-            return response()->json($menus);
+    
+            return response()->json(['base_url' => url('/'), 'data' => $result, 'status' => 200], 200);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
-        } 
+        }
     }
+    
+    
+
 
 
     /**

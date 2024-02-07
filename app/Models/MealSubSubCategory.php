@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class MealSubSubCategory extends Model
 {
     // use HasFactory;
-    protected $table = "meal_subsubcategorys" ;
+    protected $table = "tbl_meal_subsubcategories" ;
 }
