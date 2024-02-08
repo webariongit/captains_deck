@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\SliderAndBanners\WhatsNewController as AdminWhats
 
 use App\Http\Controllers\Admin\GetInTouchController as AdminGetInTouchController;
 use App\Http\Controllers\Admin\CareersController as AdminCareersController;
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -60,7 +61,7 @@ Route::prefix('/')->group(function () {
     Route::resource('/menu', MenuController::class);
     Route::resource('/gallery', GalleryController::class);
     // Route::resource('/slider-and-banners', Controller::class);
-    Route::resource('/cms', CmsController::class);
+    Route::resource('/cms', CmsController::class)->only(['index']);;
     Route::resource('/about-us', AboutUsController::class);
     Route::resource('/event', EventController::class);
     Route::resource('/whats_new', WhatsNewController::class);
@@ -71,9 +72,13 @@ Route::prefix('/')->group(function () {
 
     Route::resource('/get-in-touch', GetInTouchController::class)->only(['store']);
 
+    Route::resource('/employee-position', AdminEmployeePositionController::class)->only(['index']);
+
 });
 
 Route::prefix('/admin')->group(function () {
+
+    Route::post('login',[AdminAuthController::class, 'login']);
 
     Route::resource('/gallerys', AdminGalleryController::class)->only(['index', 'store', 'destroy']);
     Route::post('gallerys-update',[AdminGalleryController::class, 'update']);

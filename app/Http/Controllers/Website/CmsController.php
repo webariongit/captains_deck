@@ -25,15 +25,16 @@ class CmsController extends Controller
 
             if ($request->filled('title')) {
                 $data = $query->where('title', $request->title)->get();
+                 $data = $data[0];
             } else {
                 $data = $query->get();
             }
 
-            if ($data->isEmpty()) {
-                return response()->json(['message' => 'No CMS records found', 'status' => 404], 404);
-            }
-
-            return response()->json($data);
+            // if ($data->isEmpty()) {
+            //     return response()->json(['message' => 'No CMS records found', 'status' => 404], 404);
+            // }
+            return response()->json(['message' => 'No CMS records','data' => $data, 'status' => 200], 200);
+            // return response()->json($data);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);

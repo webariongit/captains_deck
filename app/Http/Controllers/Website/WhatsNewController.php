@@ -22,10 +22,10 @@ class WhatsNewController extends Controller
         try {
             $query = SliderBanner::query();
             
-            $data[] = [
-                'key_name' => 'Banner',
-                'key_data' => SliderBanner::where('type', 'banner')->get(),
-            ];
+            // $data[] = [
+            //     'key_name' => 'Banner',
+            //     'key_data' => SliderBanner::where('type', 'banner')->get(),
+            // ];
             
             $data[] = [
                 'key_name' => 'whats_new',
