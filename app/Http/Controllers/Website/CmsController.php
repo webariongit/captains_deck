@@ -90,8 +90,6 @@ class CmsController extends Controller
 
     public function ContactInfo()
     {
-        $contactInfoList = ContactInfo::all();
-
-        return response()->json(['message' => 'Contact information retrieved successfully', 'data' => $contactInfoList]);
+        return response()->json(['message' => 'Contact information retrieved successfully', 'data' => ContactInfo::find(1)]);
     }
 }

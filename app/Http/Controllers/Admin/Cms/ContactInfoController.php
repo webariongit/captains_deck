@@ -17,9 +17,9 @@ class ContactInfoController extends Controller
      */
     public function index()
     {
-        $contactInfoList = ContactInfo::all();
+        $contactInfoList = ContactInfo::get();
 
-        return response()->json(['message' => 'Contact information retrieved successfully', 'contactInfoList' => $contactInfoList]);
+        return response()->json(['message' => 'Contact information retrieved successfully', 'contactInfoList' => ContactInfo::get()]);
     }
     /**
      * Show the form for creating a new resource.

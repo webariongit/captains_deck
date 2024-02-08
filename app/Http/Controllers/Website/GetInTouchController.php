@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Website;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+
+# 
+use App\Models\GetInTouch;
 
 class GetInTouchController extends Controller
 {
@@ -28,8 +32,30 @@ class GetInTouchController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'phone_number' => 'required|digits:10',
+                'subject' => 'required|string|max:255',
+                'message' => 'required|string|max:10000',
+            ]);
+
+            $career = new GetInTouch();
+            $career->name = $validatedData['name']; 
+            $career->email = $validatedData['email'];
+            $career->phone_number = $validatedData['phone_number'];
+            $career->subject = $validatedData['subject'];
+            $career->message = $validatedData['message'];
+            $career->save();
+
+            return response()->json(['message' => 'Form submitted successfully', 'data' => $career, 'status' => 201], 201);
+        } catch (ValidationException $exception) {
+            $errors = $exception->errors();
+            return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
+        }
     }
+
 
     /**
      * Display the specified resource.

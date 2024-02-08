@@ -11,6 +11,7 @@ use App\Http\Controllers\Website\AboutUsController;
 use App\Http\Controllers\Website\EventController;
 use App\Http\Controllers\Website\WhatsNewController;
 use App\Http\Controllers\Website\CareersController;
+use App\Http\Controllers\Website\GetInTouchController;
 
 
 
@@ -19,14 +20,22 @@ use App\Http\Controllers\Admin\GalleryController as AdminGalleryController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\CmsController as AdminCmsController;
 use App\Http\Controllers\Admin\EmployeeController as AdminEmployeeController;
+use App\Http\Controllers\Admin\EmployeePositionController as AdminEmployeePositionController;
 
 use App\Http\Controllers\Admin\Menu\MenuController as AdminMenuController;
 use App\Http\Controllers\Admin\Menu\MealCategoryController as AdminMealCategoryController;
 use App\Http\Controllers\Admin\Menu\MealSubCategoryController as AdminMealSubCategoryController;
 use App\Http\Controllers\Admin\Menu\MealSubSubCategoryController as AdminMealSubSubCategoryController;
+use App\Http\Controllers\Admin\Menu\FoodTypeController as AdminFoodTypeController;
 
-use App\Http\Controllers\Admin\EmployeePositionController as AdminEmployeePositionController;
 use App\Http\Controllers\Admin\Cms\ContactInfoController as AdminContactInfoController;
+
+use App\Http\Controllers\Admin\SliderAndBanners\BlogController as AdminBlogController;
+use App\Http\Controllers\Admin\SliderAndBanners\AvailableOffersController as AdminAvailableOffersController;
+use App\Http\Controllers\Admin\SliderAndBanners\WhatsNewController as AdminWhatsNewController;
+
+use App\Http\Controllers\Admin\GetInTouchController as AdminGetInTouchController;
+use App\Http\Controllers\Admin\CareersController as AdminCareersController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -44,37 +53,42 @@ use App\Http\Controllers\Admin\Cms\ContactInfoController as AdminContactInfoCont
 
 
 
-Route::resource('/home', HomeController::class);
-Route::resource('/menu', MenuController::class);
-Route::resource('/gallery', GalleryController::class);
-// Route::resource('/slider-and-banners', Controller::class);
-Route::resource('/cms', CmsController::class);
-Route::resource('/about-us', AboutUsController::class);
-Route::resource('/events', EventController::class);
-Route::resource('/whats_new', WhatsNewController::class);
-Route::resource('/reservations', ReservationsController::class);
-Route::resource('/careers', CareersController::class);
 
-Route::get('contactInfo',[CmsController::class, 'ContactInfo']);
+Route::prefix('/')->group(function () {
 
+    Route::resource('/home', HomeController::class);
+    Route::resource('/menu', MenuController::class);
+    Route::resource('/gallery', GalleryController::class);
+    // Route::resource('/slider-and-banners', Controller::class);
+    Route::resource('/cms', CmsController::class);
+    Route::resource('/about-us', AboutUsController::class);
+    Route::resource('/event', EventController::class);
+    Route::resource('/whats_new', WhatsNewController::class);
+    Route::resource('/reservations', ReservationsController::class);
+    Route::resource('/careers', CareersController::class);
 
+    Route::get('contactInfo',[CmsController::class, 'ContactInfo']);
 
-Route::prefix('admin')->group(function () {
+    Route::resource('/get-in-touch', GetInTouchController::class)->only(['store']);
 
-    Route::resource('/gallery', AdminGalleryController::class)->only(['index', 'store', 'destroy']);
-    Route::post('gallery-update',[AdminGalleryController::class, 'update']);
+});
 
-    Route::resource('/menu', AdminMenuController::class)->only(['index', 'store', 'destroy']);
-    Route::post('menu-update',[AdminMenuController::class, 'update']);
+Route::prefix('/admin')->group(function () {
+
+    Route::resource('/gallerys', AdminGalleryController::class)->only(['index', 'store', 'destroy']);
+    Route::post('gallerys-update',[AdminGalleryController::class, 'update']);
+
+    // Route::resource('/menus', AdminMenuController::class)->only(['index', 'store', 'destroy']);
+    // Route::post('menus-update',[AdminMenuController::class, 'update']);
 
     Route::resource('/events', AdminEventController::class)->only(['index', 'store', 'destroy']);
     Route::post('events-update',[AdminEventController::class, 'update']);
 
-    Route::resource('/cms', AdminCmsController::class)->only(['index', 'store', 'destroy']);
-    Route::post('cms-update',[AdminCmsController::class, 'update']);
+    Route::resource('/cmss', AdminCmsController::class)->only(['index', 'store', 'destroy']);
+    Route::post('cmss-update',[AdminCmsController::class, 'update']);
 
-    Route::resource('/employee', AdminEmployeeController::class)->only(['index', 'store', 'destroy']);
-    Route::post('employee-update',[AdminEmployeeController::class, 'update']);
+    Route::resource('/employees', AdminEmployeeController::class)->only(['index', 'store', 'destroy']);
+    Route::post('employees-update',[AdminEmployeeController::class, 'update']);
 
     
     Route::resource('/menus', AdminMenuController::class)->only(['index', 'store', 'destroy']);
@@ -94,5 +108,23 @@ Route::prefix('admin')->group(function () {
     
     Route::resource('/contactInfo', AdminContactInfoController::class)->only(['index', 'store', 'destroy']);
     Route::post('/contactInfo-update', [AdminContactInfoController::class, 'update']);
+
+    Route::resource('/blog', AdminBlogController::class)->only(['index', 'store', 'destroy']);
+    Route::post('/blog-update', [AdminBlogController::class, 'update']);
+
+    Route::resource('/available-offers', AdminAvailableOffersController::class)->only(['index', 'store', 'destroy']);
+    Route::post('/available-offers-update', [AdminAvailableOffersController::class, 'update']);
+
+    Route::resource('/whats-news', AdminWhatsNewController::class)->only(['index', 'store', 'destroy']);
+    Route::post('/whats-new-update', [AdminWhatsNewController::class, 'update']);
+
+    Route::resource('/food-types', AdminFoodTypeController::class)->only(['index', 'store', 'destroy']);
+    Route::post('/food-type-update', [AdminFoodTypeController::class, 'update']);
+
+    Route::resource('/get-in-touchs', AdminGetInTouchController::class)->only(['index', 'store', 'destroy']);
+    Route::post('/get-in-touch-updates', [AdminGetInTouchController::class, 'update']);
+
+    Route::resource('/careerss', AdminCareersController::class)->only(['index', 'store', 'destroy']);
+    Route::post('/careers-update', [AdminCareersController::class, 'update']);
 
 });

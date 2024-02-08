@@ -14,31 +14,86 @@ class CmsController extends Controller
     /**
      * Display a listing of the resource.
      */
-
     public function index(Request $request)
     {
         try {
-            $this->validate($request, [
-                'title' => 'nullable|string',
+            $validatedData = $request->validate([
+                'id' => 'nullable|integer|gt:0',
+                'sort' => 'nullable|in:DESC,ASC',
+                'search' => 'nullable|string',
+                'sortBy' => 'nullable|in:created_at,id',
+                'paginate' => 'nullable|boolean',
             ]);
+
             $query = CMS::query();
 
-            if ($request->filled('title')) {
-                $data = $query->where('title', $request->title)->first();
+            if (isset($request->id)) {
+                $cmsDetails = $query
+                    ->where('id', $request->id)
+                    ->first();
+
+                return response()->json([
+                    'base_url' => url('/'),
+                    'response' => $cmsDetails,
+                    'status' => 200
+                ], 200);
             } else {
-                $data = $query->get();
-            }
+                $sort = is_null($request->sort) ? 'DESC' : $request->sort;
+                $sortBy = is_null($request->sortBy) ? 'created_at' : $request->sortBy;
 
-            if ($data->isEmpty()) {
-                return response()->json(['message' => 'No CMS records found', 'status' => 404], 404);
-            }
+                if ($request->search) {
+                    $searchTerm = $request->search;
+                    $cmsDetails = $query
+                        ->where('title', 'LIKE', "%" . $searchTerm . "%")
+                        ->orderBy($sortBy, $sort)
+                        ->paginate(10);
+                    return response()->json([
+                        'base_url' => url('/'),
+                        'response' => $cmsDetails,
+                        'status' => 200
+                    ], 200);
+                } else {
+                    $cmsDetails = $query
+                        ->orderBy($sortBy, $sort)
+                        ->paginate(10);
 
-            return response()->json($data);
-        } catch (ValidationException $exception) {
-            $errors = $exception->errors();
+                    return response()->json([
+                        'base_url' => url('/'),
+                        'response' => $cmsDetails,
+                        'status' => 200
+                    ], 200);
+                }
+            }
+        } catch (ValidationException $e) {
+            $errors = $e->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
         }
     }
+
+    // public function index(Request $request)
+    // {
+    //     try {
+    //         $this->validate($request, [
+    //             'title' => 'nullable|string',
+    //         ]);
+    //         $query = CMS::query();
+
+    //         if ($request->filled('title')) {
+    //             $data = $query->where('title', $request->title)->first();
+    //         } else {
+    //             $data = $query->get();
+    //         }
+
+    //         if ($data->isEmpty()) {
+    //             return response()->json(['message' => 'No CMS records found', 'status' => 404], 404);
+    //         }
+
+    //         return response()->json($data);
+    //     } catch (ValidationException $exception) {
+    //         $errors = $exception->errors();
+    //         return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
+    //     }
+    // }
 
 
 

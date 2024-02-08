@@ -9,4 +9,5 @@ class FoodType extends Model
 {
     // use HasFactory;
     protected $table = "tbl_food_types" ;
+    protected $fillable = ['food_type_name' , 'status'];
 }
