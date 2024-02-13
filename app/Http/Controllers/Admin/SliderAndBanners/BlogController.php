@@ -59,11 +59,12 @@ class BlogController extends Controller
                         ->orderBy($sortBy, $sort)
                         ->paginate(10);
     
-                    return response()->json([
-                        'base_url' => url('/'),
-                        'response' => $sliderBannerDetails,
-                        'status' => 200
-                    ], 200);
+                    // return response()->json([
+                    //     'base_url' => url('/'),
+                    //     'response' => $sliderBannerDetails,
+                    //     'status' => 200
+                    // ], 200);
+                    return view('admin.blogs' , ['url' => url('/'), 'datas' => $sliderBannerDetails]);
                 }
             }
         } catch (ValidationException $e) {
@@ -91,9 +92,8 @@ class BlogController extends Controller
                 'title' => 'required|string',
                 'description' => 'required|string',
                 'header' => 'required|string',
-                'media_types' => 'required|string',
-                'media' => 'required|string',
-                'status' => 'required|string|in:1,0',
+                'media' => 'required|mimes:jpeg,png,jpj',
+                // 'status' => 'required|string|in:1,0',
             ]);
 
             $SliderBanner = new SliderBanner();
@@ -101,12 +101,31 @@ class BlogController extends Controller
             $SliderBanner->title = $request->title;
             $SliderBanner->header = $request->header;
             $SliderBanner->description = $request->description;
-            $SliderBanner->media_types = $request->media_types;
-            $SliderBanner->media = $request->media;
-            $SliderBanner->status = $request->status;
+
+            if ($request->media) {
+                $file = $request->media;
+                $ext = $file->getClientOriginalExtension();
+                $saveFileName = time() . '.' . $ext;
+                $destinationPath = public_path('/uploads/gallery');
+                $file->move($destinationPath, $saveFileName);
+                $images = '/uploads/blogs/' . $saveFileName;
+    
+    
+                if ($ext == "jpeg" || $ext == "png" || $ext == "jpg") {
+                    $media_types = "image";
+                } elseif ($ext == "mp4" || $ext == "avi" || $ext == "mov") {
+                    $media_types = "video";
+                }
+                $SliderBanner->media = $images;
+            }
+
+            $SliderBanner->media_types = $media_types;
+            
+            $SliderBanner->status = 1;
             $SliderBanner->save();
 
-            return response()->json(['message' => 'Blog created successfully', 'data' => $SliderBanner, 'status' => 201], 201);
+            return redirect()->route('admin.blogs.index')->with('success', 'Blog successfully uploaded.');
+            // return response()->json(['message' => 'Blog created successfully', 'data' => $SliderBanner, 'status' => 201], 201);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
@@ -141,9 +160,8 @@ class BlogController extends Controller
                 'title' => 'required|string',
                 'description' => 'required|string',
                 'header' => 'required|string',
-                'media_types' => 'required|string',
-                'media' => 'required|string',
-                'status' => 'required|string|in:1,0',
+                'media' => 'required|mimes:jpeg,png,jpj',
+                // 'status' => 'required|string|in:1,0',
             ]);
             
             $id = $request->id;
@@ -157,11 +175,30 @@ class BlogController extends Controller
             $SliderBanner->title = $request->title;
             $SliderBanner->header = $request->header;
             $SliderBanner->description = $request->description;
-            $SliderBanner->media_types = $request->media_types;
-            $SliderBanner->media = $request->media;
-            $SliderBanner->status = $request->status;
+
+            if ($request->media) {
+                $ext = $file->getClientOriginalExtension();
+                $saveFileName = time() . '_' . $key . '.' . $ext;
+                $destinationPath = public_path('/uploads/gallery');
+                $file->move($destinationPath, $saveFileName);
+               return $images = '/uploads/gallery/' . $saveFileName;
+
+    
+                if ($ext == "jpeg" || $ext == "png" || $ext == "jpg") {
+                    $media_types = "image";
+                } elseif ($ext == "mp4" || $ext == "avi" || $ext == "mov") {
+                    $media_types = "video";
+                } 
+
+                $SliderBanner->media = $images;
+            }
+
+            $SliderBanner->media_types = $media_types;
+            
+            $SliderBanner->status = 1;
             $SliderBanner->save();
 
+            return redirect()->route('admin.blogs.index')->with('success', 'Blog updated successfully');
             return response()->json(['message' => 'Blog updated successfully', 'data' => $SliderBanner, 'status' => 200], 200);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
@@ -179,11 +216,10 @@ class BlogController extends Controller
             $sliderBanner = SliderBanner::findOrFail($id);
             $sliderBanner->delete();
 
+            return redirect()->route('admin.blogs.index')->with('success', 'Blog deleted successfully.');
             return response()->json(['message' => 'Blog deleted successfully', 'status' => 200], 200);
         } catch (ModelNotFoundException $exception) {
             return response()->json(['message' => 'Blog not found', 'status' => 404], 404);
-        } catch (\Exception $exception) {
-            return response()->json(['message' => 'Failed to delete blog', 'status' => 500], 500);
-        }
+        } 
     }
 }

@@ -18,10 +18,10 @@ class GalleryController extends Controller
                 'media_type' => 'nullable|string|in:image,video',
                 'orderBy' => 'nullable|in:asc,desc', 
                 'orderByColumn' => 'nullable|string',  
-                'page' => 'nullable|integer|min:1',  
+                'per_page' => 'nullable|integer|min:1',  
             ]);
     
-            $page = $request->input('page', 10);  
+            $per_page = $request->input(10);  
             $orderByColumn = $request->input('orderByColumn', 'created_at');
             $orderBy = $request->input('orderBy', 'desc');
     
@@ -33,7 +33,7 @@ class GalleryController extends Controller
                 $query->where('media_types', $request->media_type);
             }
     
-            $galleries = $query->orderBy($orderByColumn, $orderBy)->paginate($page);
+            $galleries = $query->orderBy($orderByColumn, $orderBy)->paginate(10);
     
             return response()->json(['base_url' => url('/'), 'data' => $galleries , 'status' => 200], 200);
         } catch (ValidationException $exception) {

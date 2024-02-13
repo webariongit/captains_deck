@@ -25,7 +25,7 @@ class CareersController extends Controller
                 'paginate' => 'nullable|boolean',
             ]);
     
-            $query = Career::query();
+             $query = Career::query();
     
             if (isset($request->id)) {
                 $careerDetails = $query
@@ -47,23 +47,24 @@ class CareersController extends Controller
                         ->where('full_name', 'LIKE', "%" . $searchTerm . "%")
                         ->orderBy($sortBy, $sort)
                         ->paginate(10);
-                    return response()->json([
-                        'base_url' => url('/'),
-                        'response' => $careerDetails,
-                        'status' => 200
-                    ], 200);
+                    // return response()->json([
+                    //     'base_url' => url('/'),
+                    //     'response' => $careerDetails,
+                    //     'status' => 200
+                    // ], 200);
                 } else {
                     $careerDetails = $query
                         ->orderBy($sortBy, $sort)
                         ->paginate(10);
     
-                    return response()->json([
-                        'base_url' => url('/'),
-                        'response' => $careerDetails,
-                        'status' => 200
-                    ], 200);
+                    // return response()->json([
+                    //     'base_url' => url('/'),
+                    //     'response' => $careerDetails,
+                    //     'status' => 200
+                    // ], 200);
                 }
             }
+            return view('admin.apply-for-a-position', ['url' => url('/'), 'datas' => $careerDetails, 'form_route' => route('admin.Careers.update')]);
         } catch (ValidationException $e) {
             $errors = $e->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
@@ -101,15 +102,15 @@ class CareersController extends Controller
             $career->phone_number = $validatedData['phone_number'];
             $career->employee_position_id = $validatedData['employee_position_id'];
     
-            if ($request->hasFile('cv')) {
-                $cvFile = $request->file('cv');
-                $ext = $cvFile->getClientOriginalExtension();
-                $saveFileName = time() . '_' . uniqid() . '.' . $ext;
-                $destinationPath = public_path('/uploads/gallery');
-                $cvFile->move($destinationPath, $saveFileName);
-                $cvPath = '/uploads/gallery/' . $saveFileName;
-                $career->cv = $cvPath;
-            }
+            // if ($request->hasFile('cv')) {
+            //     $cvFile = $request->file('cv');
+            //     $ext = $cvFile->getClientOriginalExtension();
+            //     $saveFileName = time() . '_' . uniqid() . '.' . $ext;
+            //     $destinationPath = public_path('/uploads/gallery');
+            //     $cvFile->move($destinationPath, $saveFileName);
+            //     $cvPath = '/uploads/gallery/' . $saveFileName;
+            //     $career->cv = $cvPath;
+            // }
     
             $career->cover_letter = $validatedData['cover_letter'];
             $career->save();

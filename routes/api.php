@@ -57,7 +57,14 @@ use App\Http\Controllers\Admin\CareersController as AdminCareersController;
 Route::prefix('/')->group(function () {
 
     Route::resource('/home', HomeController::class);
-    Route::resource('/menu', MenuController::class);
+    Route::resource('/menu', MenuController::class, [
+        'names' => [
+            'index' => 'admin.menu.index',
+            'store' => 'admin.menu.store',
+            'destroy' => 'admin.menu.destroy',
+        ],
+    ]);
+    
     Route::resource('/gallery', GalleryController::class);
     // Route::resource('/slider-and-banners', Controller::class);
     Route::resource('/cms', CmsController::class);
@@ -70,6 +77,8 @@ Route::prefix('/')->group(function () {
     Route::get('contactInfo',[CmsController::class, 'ContactInfo']);
 
     Route::resource('/get-in-touch', GetInTouchController::class)->only(['store']);
+
+    Route::get('/meal-subcategories', [MenuController::class, 'subCategoryIndex']);
 
 });
 

@@ -47,6 +47,7 @@ class CmsController extends Controller
                         ->where('title', 'LIKE', "%" . $searchTerm . "%")
                         ->orderBy($sortBy, $sort)
                         ->paginate(10);
+                        return view('admin.about', ['url' => url('/'), 'datas' => $cmsDetails]);
                     return response()->json([
                         'base_url' => url('/'),
                         'response' => $cmsDetails,
@@ -64,6 +65,7 @@ class CmsController extends Controller
                     ], 200);
                 }
             }
+            
         } catch (ValidationException $e) {
             $errors = $e->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
@@ -150,9 +152,9 @@ class CmsController extends Controller
     public function update(Request $request)
     {
         try {
-            return $this->validate($request, [
+             $this->validate($request, [
                 'id' => 'required',
-                'title' => 'required|string',
+                // 'title' => 'required|string',
                 'description' => 'required|string',
             ]);
 
@@ -163,10 +165,10 @@ class CmsController extends Controller
             }
 
             $cms->update([
-                'title' => $request->title,
                 'description' => $request->description,
             ]);
 
+            return redirect()->route('admin.events.index')->with('success', 'CMS record updated successfully.');
             return response()->json(['message' => 'CMS record updated successfully', 'data' => $cms, 'status' => 200], 200);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();

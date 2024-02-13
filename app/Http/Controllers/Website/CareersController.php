@@ -40,7 +40,7 @@ class CareersController extends Controller
                 'email' => 'required|email|max:255',
                 'phone_number' => 'required|digits:10',
                 'employee_position_id' => 'required|string|max:255',
-                'cv' => 'required|file|mimes:pdf,doc,jpeg,png|max:10240',
+                'cv' => 'nullable|file|mimes:pdf,doc,jpeg,png|max:10240',
                 'cover_letter' => 'required|string|max:10000',
             ]);
 
@@ -49,15 +49,16 @@ class CareersController extends Controller
             $career->email = $validatedData['email'];
             $career->phone_number = $validatedData['phone_number'];
             $career->employee_position_id = $validatedData['employee_position_id'];
+
+           
     
             if ($request->hasFile('cv')) {
-                $cvFile = $request->file('cv');
-                $ext = $cvFile->getClientOriginalExtension();
-                $saveFileName = time() . '_' . uniqid() . '.' . $ext;
-                $destinationPath = public_path('/uploads/gallery');
-                $cvFile->move($destinationPath, $saveFileName);
-                $cvPath = '/uploads/gallery/' . $saveFileName;
-                $career->cv = $cvPath;
+                $file = $request->file('cv');
+                $fileName = time().'.'.$file->extension();
+                $path = 'uploads';
+                $file->move(public_path($path), $fileName, 'public');
+
+                $career->cv = $path.'/'.$fileName;
             }
     
             $career->cover_letter = $validatedData['cover_letter'];

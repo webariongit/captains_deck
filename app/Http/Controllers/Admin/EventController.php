@@ -18,28 +18,29 @@ class EventController extends Controller
     public function index(Request $request)
     {
         try {
+            $request->validate([
+                'media_type' => 'nullable|string|in:image,videos',
+                'order_direction' => 'nullable|in:asc,desc', 
+                'page' => 'nullable', 
+            ]);
+            $page = $request->page ?? 10;
+            $orderByColumn = 'created_at';
+            $orderByDirection = $request->order_direction ?? 'desc';
+
             $query = Event::query();
-
-            if ($request->id) {
-                $event = $query->find($request->id);
-
-                if (!$event) {
-                    return response()->json(['message' => 'Event not found', 'status' => 404], 404);
-                }
-
-                $event['gallery'] = Gallery::where('event_id', $event->id)->get();
-
-            } else {
-                $events = $query->get();
+            if ($request->media_type) {
+                $query->where('media_types', $request->media_type);
             }
 
-            return response()->json($event ?? $events);
-        } catch (ModelNotFoundException $exception) {
-            return response()->json(['message' => 'Event not found', 'status' => 404], 404);
+            $galleries = $query->orderBy($orderByColumn, $orderByDirection)->paginate($page);
+
+            return view('admin.events' , ['url' => url('/'), 'datas' => $galleries]);
+
+            return response()->json(['url' => url('/'), 'data' => $galleries], 201);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
-        }
+        } 
     }
 
 
@@ -72,18 +73,18 @@ class EventController extends Controller
             $this->validate($request, [
                 'title' => 'required|string',
                 'date' => 'required|string',
-                'image' => 'required|image',
+                'media' => 'required|image',
                 'links' => 'required|string',
                 'description' => 'required|string',
-                'galleries_media.*' => 'nullable|mimes:jpeg,png,mp4,avi,mov',
+                'galleries_media.*' => 'nullable|mimes:jpeg,png,jpj',
             ]);
     
             $event = new Event();
             $event->title = $request->title;
             $event->date = $request->date;
     
-            if ($request->hasFile('image')) {
-                $file = $request->file('image');
+            if ($request->hasFile('media')) {
+                $file = $request->file('media');
                 $images = [];
             
                 $ext = $file->getClientOriginalExtension();
@@ -92,16 +93,15 @@ class EventController extends Controller
                 $file->move($destinationPath, $saveFileName);
                 $images = '/uploads/event/gallery/' . $saveFileName;
             
-                if (in_array($ext, ['jpeg', 'png'])) {
-                    $media_type = "image";
-                } elseif (in_array($ext, ['mp4', 'avi', 'mov'])) {
-                    $media_type = "video";
-                } else {
-                    $media_type = "unknown";
-                }
+                if ($ext == "jpeg" || $ext == "png" || $ext == "jpg") {
+                    $media_types = "image";
+                } elseif ($ext == "mp4" || $ext == "avi" || $ext == "mov") {
+                    $media_types = "video";
+                } 
             
-                $event->media_types = $media_type;
+                $event->media_types = $media_types;
                 $event->media = $images;
+                $media_types = null;
             }
             
             
@@ -122,13 +122,11 @@ class EventController extends Controller
                     $file->move($destinationPath, $saveFileName);
                      $images = '/uploads/event/gallery/' . $saveFileName;
 
-                    if ($ext == "jpeg" || $ext == "png") {
+                     if ($ext == "jpeg" || $ext == "png" || $ext == "jpg") {
                         $media_types = "image";
                     } elseif ($ext == "mp4" || $ext == "avi" || $ext == "mov") {
                         $media_types = "video";
-                    }else{
-                        $media_types = "video";
-                    }
+                    } 
     
                     $eventGalleries_id = Gallery::insertGetId([
                         'event_id' => $event->id,
@@ -141,6 +139,7 @@ class EventController extends Controller
                  $event->eventGalleries = $eventGalleries;
             }
     
+            return redirect()->route('admin.events.index')->with('success', 'Galleries successfully uploaded.');
             return response()->json(['message' => 'Event created successfully', 'data' => $event, 'status' => 201], 201);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
@@ -179,10 +178,10 @@ class EventController extends Controller
                 'id' => 'required',
                 'title' => 'required|string',
                 'date' => 'required|string',
-                'image' => 'required|image',
+                'media' => 'required|image',
                 'links' => 'required|string',
                 'description' => 'required|string',
-                'galleries_media.*' => 'nullable|mimes:jpeg,png,mp4,avi,mov',
+                'galleries_media.*' => 'nullable|mimes:jpeg,png,jpj',
             ]);
     
             $id = $request->id;
@@ -205,7 +204,11 @@ class EventController extends Controller
                 $file->move($destinationPath, $saveFileName);
                 $images = '/uploads/event/gallery/' . $saveFileName;
     
-                $media_type = in_array($ext, ['jpeg', 'png']) ? "image" : (in_array($ext, ['mp4', 'avi', 'mov']) ? "video" : "unknown");
+                if ($ext == "jpeg" || $ext == "png" || $ext == "jpg") {
+                    $media_types = "image";
+                } elseif ($ext == "mp4" || $ext == "avi" || $ext == "mov") {
+                    $media_types = "video";
+                } 
                 $event->media_types = $media_type;
                 $event->media = $images;
             }
@@ -225,7 +228,12 @@ class EventController extends Controller
                     $file->move($destinationPath, $saveFileName);
                     $images = '/uploads/event/gallery/' . $saveFileName;
     
-                    $media_type = in_array($ext, ['jpeg', 'png']) ? "image" : (in_array($ext, ['mp4', 'avi', 'mov']) ? "video" : "unknown");
+                    if ($ext == "jpeg" || $ext == "png" || $ext == "jpg") {
+                        $media_types = "image";
+                    } elseif ($ext == "mp4" || $ext == "avi" || $ext == "mov") {
+                        $media_types = "video";
+                    } 
+
                     $eventGalleries_id = Gallery::insertGetId([
                         'event_id' => $event->id,
                         'media_types' => $media_type,
@@ -237,6 +245,7 @@ class EventController extends Controller
                 $event->eventGalleries = $eventGalleries;
             }
     
+            return redirect()->route('admin.events.index')->with('success', 'Galleries successfully uploaded.');
             return response()->json(['message' => 'Event updated successfully', 'data' => $event, 'status' => 200], 200);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
@@ -304,6 +313,8 @@ class EventController extends Controller
             $event = Event::find($id);
             if (!is_null($event)) {
                 $event->delete();
+
+                return redirect()->route('admin.events.index')->with('success', 'Galleries successfully uploaded.');
                 return response()->json(['message' => 'event delted', 'status' => 200], 200);
             }
             return response()->json(['message' => 'event not found', 'status' => 404], 404);            

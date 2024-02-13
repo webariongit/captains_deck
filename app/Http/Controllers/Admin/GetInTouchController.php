@@ -47,23 +47,26 @@ class GetInTouchController extends Controller
                         ->where('name', 'LIKE', "%" . $searchTerm . "%")
                         ->orderBy($sortBy, $sort)
                         ->paginate(10);
-                    return response()->json([
-                        'base_url' => url('/'),
-                        'response' => $cmsDetails,
-                        'status' => 200
-                    ], 200);
+                    // return response()->json([
+                    //     'base_url' => url('/'),
+                    //     'response' => $cmsDetails,
+                    //     'status' => 200
+                    // ], 200);
                 } else {
                     $cmsDetails = $query
                         ->orderBy($sortBy, $sort)
                         ->paginate(10);
 
-                    return response()->json([
-                        'base_url' => url('/'),
-                        'response' => $cmsDetails,
-                        'status' => 200
-                    ], 200);
+                    
+                    // return response()->json([
+                    //     'base_url' => url('/'),
+                    //     'response' => $cmsDetails,
+                    //     'status' => 200
+                    // ], 200);
                 }
             }
+            
+            return view('admin.get-in-touch' , ['url' => url('/'), 'datas' => $cmsDetails]);
         } catch (ValidationException $e) {
             $errors = $e->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
@@ -165,12 +168,20 @@ class GetInTouchController extends Controller
      */
     public function destroy(string $id)
     {
-        $GetInTouch = GetInTouch::find($id);
+        try {
+            $getInTouch = GetInTouch::find($id);
 
-            if (!$GetInTouch) {
-                return response()->json(['message' => 'GetInTouch not found', 'status' => 404], 404);
+            if (is_null($getInTouch)) {
+                return redirect()->route('admin.get-in-touch.index')->with('success', 'GetInTouch not found');
             }
 
-        return response()->json(['message' => 'career deleted successfully']);
+            $getInTouch->delete();
+
+            return redirect()->route('admin.get-in-touch.index')->with('success', 'GetInTouch deleted successfully');
+        } catch (Exception $exception) {
+            // Handle any exceptions that might occur during the deletion
+            return redirect()->route('admin.get-in-touch.index')->with('error', 'Error deleting GetInTouch');
+        }
     }
+
 }

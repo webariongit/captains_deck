@@ -27,11 +27,11 @@ class MenuController extends Controller
             if (!$Menu) {
                 return response()->json(['message' => 'Meal category not found', 'status' => 404], 404);
             }
-
-            return response()->json(['data' => $Menu, 'status' => 200], 200);
+            return view('admin.meal-category', ['url' => url('/'), 'datas' => $Menu]);
         } else {
             $Menu = Menu::get();
-            return response()->json(['data' => $Menu, 'status' => 200], 200);
+            return view('admin.meal-menu', ['url' => url('/'), 'datas' => $Menu]);
+            // return response()->json(['data' => $Menu, 'status' => 200], 200);
         }
     }
 
@@ -89,6 +89,7 @@ class MenuController extends Controller
     
             $menu->save();
     
+            return redirect()->route('admin.menus.index')->with('success', 'Meal created successfully.');
             return response()->json(['message' => 'Menu created successfully', 'data' => $menu, 'status' => 201], 201);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
@@ -166,6 +167,7 @@ class MenuController extends Controller
     
             $menu->save();
     
+            return redirect()->route('admin.menus.index')->with('success', 'Menu updated successfully');
             return response()->json(['message' => 'Menu updated successfully', 'data' => $menu, 'status' => 200], 200);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
@@ -183,7 +185,7 @@ class MenuController extends Controller
      */
     public function destroy($id)
     {
-        $MealSubSubCategory = MealSubSubCategory::find($id);
+        $MealSubSubCategory = Menu::find($id);
 
         if (!$MealSubSubCategory) {
             return response()->json(['message' => 'Meal category not found', 'status' => 404], 404);
@@ -191,7 +193,8 @@ class MenuController extends Controller
 
         $MealSubSubCategory->delete();
 
-        return response()->json(['message' => 'Meal category deleted successfully', 'status' => 200], 200);
+        return redirect()->route('admin.menus.index')->with('success', 'Meal deleted successfully.');
+        return response()->json(['message' => 'Meal deleted successfully', 'status' => 200], 200);
     }
 
 }

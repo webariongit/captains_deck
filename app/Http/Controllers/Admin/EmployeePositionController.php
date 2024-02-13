@@ -17,7 +17,7 @@ class EmployeePositionController extends Controller
     public function index(Request $request)
     {
         $EmployeePositions = EmployeePosition::all();
-
+        return view('admin.employee-positions', ['url' => url('/'), 'datas' => $EmployeePositions]);
         return response()->json(['data' => $EmployeePositions, 'status' => 201], 201);
     }
 
@@ -44,7 +44,8 @@ class EmployeePositionController extends Controller
 
             $employeePosition->position = $request->position;
             $employeePosition->save();
-            
+
+            return redirect()->route('admin.employee-positions.index')->with('success', 'Galleries successfully uploaded.');
             return response()->json(['message' => 'Employee position created successfully', 'data' => $employeePosition, 'status' => 201], 201);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
@@ -90,6 +91,7 @@ class EmployeePositionController extends Controller
             $employeePosition->position = $request->position;
             $employeePosition->save();
 
+            return redirect()->route('admin.employee-positions.index')->with('success', 'Galleries successfully uploaded.');
             return response()->json(['message' => 'Employee position updated successfully', 'data' => $employeePosition, 'status' => 200], 200);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
@@ -106,6 +108,7 @@ class EmployeePositionController extends Controller
         $EmployeePosition = EmployeePosition::findOrFail($id);
         $EmployeePosition->delete();
 
+        return redirect()->route('admin.employee-positions.index')->with('success', 'Galleries successfully uploaded.');
         return response()->json(['message' => 'EmployeePosition deleted successfully']);
     }
 }

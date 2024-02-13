@@ -48,24 +48,25 @@ class WhatsNewController extends Controller
                         ->where('title', 'LIKE', "%" . $searchTerm . "%")
                         ->orderBy($sortBy, $sort)
                         ->paginate(10);
-                    return response()->json([
-                        'base_url' => url('/'),
-                        'response' => $sliderBannerDetails,
-                        'status' => 200
-                    ], 200);
+                    // return response()->json([
+                    //     'base_url' => url('/'),
+                    //     'response' => $sliderBannerDetails,
+                    //     'status' => 200
+                    // ], 200);
                 } else {
                     $sliderBannerDetails = $query
                         ->where('type', 'whats_new')
                         ->orderBy($sortBy, $sort)
                         ->paginate(10);
     
-                    return response()->json([
-                        'base_url' => url('/'),
-                        'response' => $sliderBannerDetails,
-                        'status' => 200
-                    ], 200);
+                    // return response()->json([
+                    //     'base_url' => url('/'),
+                    //     'response' => $sliderBannerDetails,
+                    //     'status' => 200
+                    // ], 200);
                 }
             }
+            return view('admin.whats-news' , ['url' => url('/'), 'datas' => $sliderBannerDetails]);
         } catch (ValidationException $e) {
             $errors = $e->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);

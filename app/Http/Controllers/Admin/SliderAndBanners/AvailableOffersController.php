@@ -48,24 +48,25 @@ class AvailableOffersController extends Controller
                         ->where('title', 'LIKE', "%" . $searchTerm . "%")
                         ->orderBy($sortBy, $sort)
                         ->paginate(10);
-                    return response()->json([
-                        'base_url' => url('/'),
-                        'response' => $sliderBannerDetails,
-                        'status' => 200
-                    ], 200);
+                    // return response()->json([
+                    //     'base_url' => url('/'),
+                    //     'response' => $sliderBannerDetails,
+                    //     'status' => 200
+                    // ], 200);
                 } else {
                     $sliderBannerDetails = $query
                         ->where('type', 'available_offers')
                         ->orderBy($sortBy, $sort)
                         ->paginate(10);
     
-                    return response()->json([
-                        'base_url' => url('/'),
-                        'response' => $sliderBannerDetails,
-                        'status' => 200
-                    ], 200);
+                    // return response()->json([
+                    //     'base_url' => url('/'),
+                    //     'response' => $sliderBannerDetails,
+                    //     'status' => 200
+                    // ], 200);
                 }
             }
+            return view('admin.available-offers' , ['url' => url('/'), 'datas' => $sliderBannerDetails]);
         } catch (ValidationException $e) {
             $errors = $e->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
@@ -90,22 +91,38 @@ class AvailableOffersController extends Controller
                 'title' => 'required|string',
                 'description' => 'required|string',
                 'header' => 'required|string',
-                'media_types' => 'required|string',
-                'media' => 'required|string',
-                'status' => 'required|string|in:1,0',
+                'media' => 'required|mimes:jpeg,png,jpj',
+                // 'status' => 'required|string|in:1,0',
             ]);
 
             $SliderBanner = new SliderBanner();
             $SliderBanner->type = 'available_offers';
-            $SliderBanner->banner_place = '.';
             $SliderBanner->title = $request->title;
             $SliderBanner->header = $request->header;
             $SliderBanner->description = $request->description;
-            $SliderBanner->media_types = $request->media_types;
-            $SliderBanner->media = $request->media;
-            $SliderBanner->status = $request->status;
-            $SliderBanner->save();
 
+            if ($request->media) {
+                $file = $request->media;
+                $ext = $file->getClientOriginalExtension();
+                $saveFileName = time() . '.' . $ext;
+                $destinationPath = public_path('/uploads/gallery');
+                $file->move($destinationPath, $saveFileName);
+                $images = '/uploads/blogs/' . $saveFileName;
+    
+    
+                if ($ext == "jpeg" || $ext == "png" || $ext == "jpg") {
+                    $media_types = "image";
+                } elseif ($ext == "mp4" || $ext == "avi" || $ext == "mov") {
+                    $media_types = "video";
+                }
+                $SliderBanner->media = $images;
+            }
+
+            $SliderBanner->media_types = $media_types;
+            
+            $SliderBanner->status = 1;
+            $SliderBanner->save();
+            return redirect()->route('admin.available-offers.index')->with('success', 'Gallery successfully uploaded.');
             return response()->json(['message' => 'Blog created successfully', 'data' => $SliderBanner, 'status' => 201], 201);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
@@ -141,27 +158,46 @@ class AvailableOffersController extends Controller
                 'title' => 'required|string',
                 'description' => 'required|string',
                 'header' => 'required|string',
-                'media_types' => 'required|string',
-                'media' => 'required|string',
-                'status' => 'required|string|in:1,0',
+                'media' => 'required|mimes:jpeg,png,jpj',
+                // 'status' => 'required|string|in:1,0',
             ]);
             
             $id = $request->id;
             $SliderBanner = SliderBanner::find($id);
 
             if (!$SliderBanner) {
-                return response()->json(['message' => 'Blog not found', 'status' => 404], 404);
+                return response()->json(['message' => 'available-offers not found', 'status' => 404], 404);
             }
 
             $SliderBanner->type = 'available_offers';
             $SliderBanner->title = $request->title;
             $SliderBanner->header = $request->header;
             $SliderBanner->description = $request->description;
-            $SliderBanner->media_types = $request->media_types;
-            $SliderBanner->media = $request->media;
-            $SliderBanner->status = $request->status;
+
+            if ($request->media) {
+                $file = $request->media;
+                $ext = $file->getClientOriginalExtension();
+                $saveFileName = time() . '.' . $ext;
+                $destinationPath = public_path('/uploads/gallery');
+                $file->move($destinationPath, $saveFileName);
+                $images = '/uploads/gallery/' . $saveFileName;
+
+    
+                if ($ext == "jpeg" || $ext == "png" || $ext == "jpg") {
+                    $media_types = "image";
+                } elseif ($ext == "mp4" || $ext == "avi" || $ext == "mov") {
+                    $media_types = "video";
+                } 
+
+                $SliderBanner->media = $images;
+            }
+
+            $SliderBanner->media_types = $media_types;
+            
+            $SliderBanner->status = 1;
             $SliderBanner->save();
 
+            return redirect()->route('admin.available-offers.index')->with('success', 'Gallery successfully uploaded.');
             return response()->json(['message' => 'Blog updated successfully', 'data' => $SliderBanner, 'status' => 200], 200);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
@@ -179,6 +215,7 @@ class AvailableOffersController extends Controller
             $sliderBanner = SliderBanner::findOrFail($id);
             $sliderBanner->delete();
 
+            return redirect()->route('admin.available-offers.index')->with('success', 'Gallery successfully uploaded.');
             return response()->json(['message' => 'Blog deleted successfully', 'status' => 200], 200);
         } catch (ModelNotFoundException $exception) {
             return response()->json(['message' => 'Blog not found', 'status' => 404], 404);

@@ -17,8 +17,8 @@ class ContactInfoController extends Controller
      */
     public function index()
     {
-        $contactInfoList = ContactInfo::get();
-
+        $contactInfoList = ContactInfo::first();
+        return view('admin.contactInfo' , ['url' => url('/'), 'datas' => $contactInfoList]);
         return response()->json(['message' => 'Contact information retrieved successfully', 'contactInfoList' => ContactInfo::get()]);
     }
     /**
@@ -38,7 +38,7 @@ class ContactInfoController extends Controller
             $validatedData = $request->validate([
                 'phone_code' => 'required|regex:/^\+[0-9]+$/',
                 'contact' => 'required|regex:/^\d{10}$/',
-                'email' => 'required|email:rds,dns',
+                'email' => 'required',
                 'address' => 'required',
                 'facebook' => 'required',
                 'instagram' => 'required',
@@ -48,11 +48,14 @@ class ContactInfoController extends Controller
                 'order_online' => 'required',
                 'open_hours' => 'required',
             ]);
-
-            // Create a new ContactInfo instance
-            $contactInfo = new ContactInfo;
-
-            // Set each attribute individually
+    
+            $id = 1;
+            $contactInfo = ContactInfo::find($id);
+    
+            if (!$contactInfo) {
+                return response()->json(['message' => 'ContactInfo not found', 'status' => 404], 404);
+            }
+    
             $contactInfo->phone_code = $validatedData['phone_code'];
             $contactInfo->contact = $validatedData['contact'];
             $contactInfo->email = $validatedData['email'];
@@ -64,11 +67,10 @@ class ContactInfoController extends Controller
             $contactInfo->linkedin = $validatedData['linkedin'];
             $contactInfo->order_online = $validatedData['order_online'];
             $contactInfo->open_hours = $validatedData['open_hours'];
-
-            // Save the instance to the database
+    
             $contactInfo->save();
-
-            return response()->json(['message' => 'Contact information created successfully', 'contactInfo' => $contactInfo]);
+            
+            return redirect()->route('admin.contactInfo.index')->with('success', 'Galleries successfully uploaded.');
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
@@ -101,7 +103,7 @@ class ContactInfoController extends Controller
             $validatedData = $request->validate([
                 'phone_code' => 'required|regex:/^\+[0-9]+$/',
                 'contact' => 'required|regex:/^\d{10}$/',
-                'email' => 'required|email:rds,dns',
+                'email' => 'required',
                 'address' => 'required',
                 'facebook' => 'required',
                 'instagram' => 'required',

@@ -69,27 +69,27 @@ class HomeController extends Controller
             
             $data[] = [
                 'key_name' => 'Banner',
-                'key_data' => SliderBanner::where('title', 'banner')->get(),
+                'key_data' => SliderBanner::where('type', 'banner')->get(),
             ];
             
             $data[] = [
                 'key_name' => 'Content',
-                'key_data' => SliderBanner::where('title', 'content')->get(),
+                'key_data' => SliderBanner::where('type', 'content')->get(),
             ];
             
             $data[] = [
                 'key_name' => 'blogs',
-                'key_data' => SliderBanner::where('title', 'blogs')->get(),
+                'key_data' => SliderBanner::where('type', 'blogs')->get(),
             ];
             
             $data[] = [
                 'key_name' => 'available_offers',
-                'key_data' => SliderBanner::where('title', 'available_offers')->get(),
+                'key_data' => SliderBanner::where('type', 'available_offers')->get(),
             ];
             
             $data[] = [
                 'key_name' => 'Gallery',
-                'key_data' => Gallery::where('event_id', null)->get(),
+                'key_data' => Gallery::where('event_id', null)->take(20)->get(),
             ];
             
             $data[] = [

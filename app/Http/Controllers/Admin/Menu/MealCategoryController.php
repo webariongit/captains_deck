@@ -27,9 +27,11 @@ class MealCategoryController extends Controller
                 return response()->json(['message' => 'Meal category not found', 'status' => 404], 404);
             }
 
+            return view('admin.meal-category', ['url' => url('/'), 'datas' => $mealCategory]);
             return response()->json(['data' => $mealCategory, 'status' => 200], 200);
         } else {
             $mealCategories = MealCategory::get();
+            return view('admin.meal-category', ['url' => url('/'), 'datas' => $mealCategories]);
             return response()->json(['data' => $mealCategories, 'status' => 200], 200);
         }
     }

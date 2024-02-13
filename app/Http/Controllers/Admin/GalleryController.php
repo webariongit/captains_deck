@@ -14,6 +14,21 @@ class GalleryController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // public function index(Request $request)
+    // {
+    //     return view('admin.about');
+
+    //     // try {
+    //     //         // return $request->all();
+              
+
+    //     //         // return redirect()->url('admin/about');
+
+    //     // } catch (ValidationException $exception) {
+    //     //     $errors = $exception->errors();
+    //     //     return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
+    //     // } 
+    // }
     public function index(Request $request)
     {
         try {
@@ -32,6 +47,8 @@ class GalleryController extends Controller
             }
 
             $galleries = $query->orderBy($orderByColumn, $orderByDirection)->paginate($page);
+
+            return view('admin.gallerys' , ['url' => url('/'), 'datas' => $galleries]);
 
             return response()->json(['url' => url('/'), 'data' => $galleries], 201);
         } catch (ValidationException $exception) {
@@ -69,14 +86,16 @@ class GalleryController extends Controller
                 $destinationPath = public_path('/uploads/gallery');
                 $file->move($destinationPath, $saveFileName);
                 $images = '/uploads/gallery/' . $saveFileName;
+
     
-                if ($ext == "jpeg" || $ext == "png") {
+                if ($ext == "jpeg" || $ext == "png" || $ext == "jpg") {
                     $media_types = "image";
                 } elseif ($ext == "mp4" || $ext == "avi" || $ext == "mov") {
                     $media_types = "video";
-                } else {
-                    $media_types = "video";
-                }
+                } 
+                // else {
+                //     $media_types = "video";
+                // }
     
                 $eventGalleries_id = Gallery::insertGetId([
                     'event_id' => null, 
@@ -86,13 +105,42 @@ class GalleryController extends Controller
     
                 $eventGalleries[$key] = Gallery::find($eventGalleries_id);
             }
-    
-            return response()->json(['url' => url('/'), 'gallery_data' => $eventGalleries], 201);
+            $query = Gallery::query();
+            $galleries = $query->paginate();
+
+            return redirect()->route('admin.gallerys.index')->with('success', 'Galleries successfully uploaded.');
+            // return response()->json(['url' => url('/'), 'gallery_data' => $eventGalleries], 201);
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
             return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
         } 
     }
+    public function youtubeLinkStore(Request $request)
+    {
+        try {
+            $request->validate([
+                'video_link' => 'required|url',
+            ]);
+    
+            $link = $request->input('link');
+    
+            $eventGalleries_id = Gallery::insertGetId([
+                'event_id' => null, 
+                'media_types' => 'youtube',
+                'media' => $request->video_link,
+            ]);
+    
+            $query = Gallery::query();
+            $galleries = $query->paginate();
+    
+            return redirect()->route('admin.gallerys.index')->with('success', 'Gallery successfully uploaded.');
+    
+        } catch (ValidationException $exception) {
+            $errors = $exception->errors();
+            return response()->json(['message' => 'Validation failed', 'errors' => $errors, 'status' => 400], 400);
+        } 
+    }
+    
     
     
 
@@ -180,9 +228,12 @@ class GalleryController extends Controller
             $gallery = Gallery::find($id);
             if (!is_null($gallery)) {
                 $gallery->delete();
-                return response()->json(['message' => 'Gallery delted', 'status' => 200], 200);
+                return redirect()->route('admin.gallerys.index')->with('success', 'data delted.');
+                // return response()->json(['message' => 'Gallery delted', 'status' => 200], 200);
             }
-            return response()->json(['message' => 'Gallery not found', 'status' => 404], 404);            
+
+            return redirect()->route('admin.gallerys.index')->with('success', 'data not found');
+            // return response()->json(['message' => 'Gallery not found', 'status' => 404], 404);            
 
         } catch (ValidationException $exception) {
             $errors = $exception->errors();
